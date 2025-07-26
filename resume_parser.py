@@ -62,10 +62,19 @@ class ResumeParser:
             'name': self._extract_name(text),
             'email': self._extract_email(text),
             'phone': self._extract_phone(text),
+            'location': self._extract_location(text),
+            'linkedin': self._extract_linkedin(text),
+            'github': self._extract_github(text),
+            'portfolio_url': self._extract_portfolio_url(text),
             'summary': self._extract_summary(text),
             'skills': self._extract_skills(text),
             'experience': self._extract_experience(text),
+            'projects': self._extract_projects(text),
             'education': self._extract_education(text),
+            'certifications': self._extract_certifications(text),
+            'achievements': self._extract_achievements(text),
+            'languages': self._extract_languages(text),
+            'interests': self._extract_interests(text),
             'raw_text': text
         }
         
@@ -202,3 +211,217 @@ class ResumeParser:
                 break
         
         return education
+    
+    def _extract_location(self, text: str) -> str:
+        """Extract location from resume text"""
+        location_patterns = [
+            r'([A-Za-z\s]+,\s*[A-Z]{2})',  # City, State
+            r'([A-Za-z\s]+,\s*[A-Za-z\s]+)',  # City, Country
+            r'\b(Remote)\b',  # Remote work
+        ]
+        
+        for pattern in location_patterns:
+            matches = re.findall(pattern, text, re.IGNORECASE)
+            if matches:
+                return matches[0].strip()
+        return ""
+    
+    def _extract_linkedin(self, text: str) -> str:
+        """Extract LinkedIn URL from resume text"""
+        linkedin_pattern = r'(?:linkedin\.com/in/|linkedin\.com/profile/)([A-Za-z0-9\-\.]+)'
+        matches = re.findall(linkedin_pattern, text, re.IGNORECASE)
+        if matches:
+            return f"https://linkedin.com/in/{matches[0]}"
+        
+        # Also check for just linkedin usernames
+        linkedin_pattern2 = r'linkedin[:\s]+([A-Za-z0-9\-\.]+)'
+        matches2 = re.findall(linkedin_pattern2, text, re.IGNORECASE)
+        if matches2:
+            return f"https://linkedin.com/in/{matches2[0]}"
+        return ""
+    
+    def _extract_github(self, text: str) -> str:
+        """Extract GitHub URL from resume text"""
+        github_pattern = r'(?:github\.com/)([A-Za-z0-9\-\.]+)'
+        matches = re.findall(github_pattern, text, re.IGNORECASE)
+        if matches:
+            return f"https://github.com/{matches[0]}"
+        
+        # Also check for just github usernames
+        github_pattern2 = r'github[:\s]+([A-Za-z0-9\-\.]+)'
+        matches2 = re.findall(github_pattern2, text, re.IGNORECASE)
+        if matches2:
+            return f"https://github.com/{matches2[0]}"
+        return ""
+    
+    def _extract_portfolio_url(self, text: str) -> str:
+        """Extract portfolio URL from resume text"""
+        url_pattern = r'(?:portfolio|website)[:\s]+(https?://[^\s]+)'
+        matches = re.findall(url_pattern, text, re.IGNORECASE)
+        if matches:
+            return matches[0]
+        
+        # Look for personal domains
+        domain_pattern = r'(https?://(?:www\.)?[a-zA-Z0-9\-]+\.[a-zA-Z]{2,})'
+        domains = re.findall(domain_pattern, text)
+        for domain in domains:
+            if not any(site in domain.lower() for site in ['linkedin', 'github', 'gmail', 'yahoo', 'outlook']):
+                return domain
+        return ""
+    
+    def _extract_projects(self, text: str) -> List[Dict]:
+        """Extract projects from resume text"""
+        projects = []
+        project_keywords = ['projects', 'portfolio', 'personal projects', 'key projects']
+        lines = text.split('\n')
+        
+        for i, line in enumerate(lines):
+            if any(keyword in line.lower() for keyword in project_keywords):
+                # Extract project entries
+                for j in range(i + 1, min(i + 15, len(lines))):
+                    project_line = lines[j].strip()
+                    if not project_line:
+                        continue
+                    if any(section in project_line.lower() 
+                          for section in ['experience', 'education', 'skills', 'work']):
+                        break
+                    
+                    # Look for project patterns
+                    if len(project_line) > 10 and len(projects) < 6:
+                        project = {
+                            'title': project_line,
+                            'description': '',
+                            'technologies': [],
+                            'url': ''
+                        }
+                        
+                        # Look for technologies in next few lines
+                        for k in range(j + 1, min(j + 3, len(lines))):
+                            if k < len(lines):
+                                next_line = lines[k].strip()
+                                if any(tech_word in next_line.lower() for tech_word in ['tech', 'built', 'using', 'language']):
+                                    tech_list = re.split(r'[,•·\-]', next_line)
+                                    project['technologies'] = [t.strip() for t in tech_list if t.strip()][:5]
+                                    break
+                                elif next_line and len(next_line) > 20:
+                                    project['description'] = next_line
+                        
+                        projects.append(project)
+                break
+        
+        return projects
+    
+    def _extract_certifications(self, text: str) -> List[Dict]:
+        """Extract certifications from resume text"""
+        certifications = []
+        cert_keywords = ['certification', 'certificate', 'licensed', 'certified', 'credentials']
+        lines = text.split('\n')
+        
+        for i, line in enumerate(lines):
+            if any(keyword in line.lower() for keyword in cert_keywords):
+                # Extract certification entries
+                for j in range(i + 1, min(i + 10, len(lines))):
+                    cert_line = lines[j].strip()
+                    if not cert_line:
+                        continue
+                    if any(section in cert_line.lower() 
+                          for section in ['experience', 'education', 'skills', 'work']):
+                        break
+                    
+                    if len(cert_line) > 5 and len(certifications) < 8:
+                        # Extract year if present
+                        year_match = re.search(r'(20\d{2})', cert_line)
+                        year = year_match.group(1) if year_match else ''
+                        
+                        certifications.append({
+                            'name': cert_line,
+                            'issuer': '',
+                            'year': year
+                        })
+                break
+        
+        return certifications
+    
+    def _extract_achievements(self, text: str) -> List[str]:
+        """Extract achievements and awards from resume text"""
+        achievements = []
+        achievement_keywords = ['award', 'achievement', 'honor', 'recognition', 'scholarship', 'competition']
+        lines = text.split('\n')
+        
+        for i, line in enumerate(lines):
+            if any(keyword in line.lower() for keyword in achievement_keywords):
+                # Extract achievement entries
+                for j in range(i + 1, min(i + 8, len(lines))):
+                    achievement_line = lines[j].strip()
+                    if not achievement_line:
+                        continue
+                    if any(section in achievement_line.lower() 
+                          for section in ['experience', 'education', 'skills', 'work']):
+                        break
+                    
+                    if len(achievement_line) > 5 and len(achievements) < 6:
+                        achievements.append(achievement_line)
+                break
+        
+        return achievements
+    
+    def _extract_languages(self, text: str) -> List[Dict]:
+        """Extract languages from resume text"""
+        languages = []
+        language_keywords = ['language', 'fluent', 'native', 'proficient']
+        
+        # Common languages list for better detection
+        common_languages = [
+            'english', 'spanish', 'french', 'german', 'italian', 'portuguese', 'russian',
+            'chinese', 'japanese', 'korean', 'arabic', 'hindi', 'dutch', 'swedish'
+        ]
+        
+        lines = text.split('\n')
+        for i, line in enumerate(lines):
+            if any(keyword in line.lower() for keyword in language_keywords):
+                # Extract language entries
+                for j in range(i, min(i + 5, len(lines))):
+                    lang_line = lines[j].strip().lower()
+                    for lang in common_languages:
+                        if lang in lang_line and len(languages) < 5:
+                            proficiency = 'Fluent'
+                            if 'native' in lang_line:
+                                proficiency = 'Native'
+                            elif 'basic' in lang_line:
+                                proficiency = 'Basic'
+                            elif 'intermediate' in lang_line:
+                                proficiency = 'Intermediate'
+                            
+                            languages.append({
+                                'name': lang.title(),
+                                'proficiency': proficiency
+                            })
+                break
+        
+        return languages
+    
+    def _extract_interests(self, text: str) -> List[str]:
+        """Extract interests and hobbies from resume text"""
+        interests = []
+        interest_keywords = ['interest', 'hobby', 'hobbies', 'personal', 'activities']
+        lines = text.split('\n')
+        
+        for i, line in enumerate(lines):
+            if any(keyword in line.lower() for keyword in interest_keywords):
+                # Extract interest entries
+                for j in range(i, min(i + 3, len(lines))):
+                    interest_line = lines[j].strip()
+                    if not interest_line:
+                        continue
+                    
+                    # Split by common delimiters
+                    line_interests = re.split(r'[,•·\-\n]', interest_line)
+                    for interest in line_interests:
+                        interest = interest.strip()
+                        if (interest and len(interest) > 2 and len(interest) < 30 
+                            and not any(keyword in interest.lower() for keyword in interest_keywords)
+                            and len(interests) < 8):
+                            interests.append(interest)
+                break
+        
+        return interests

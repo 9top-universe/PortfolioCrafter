@@ -9,13 +9,42 @@ class PortfolioGenerator:
         """Generate portfolio data structure from parsed resume data"""
         try:
             portfolio_data = {
+                # Header/Contact Information
                 'name': self._clean_text(parsed_data.get('name', 'Portfolio Owner')),
                 'email': parsed_data.get('email', ''),
                 'phone': parsed_data.get('phone', ''),
+                'location': self._clean_text(parsed_data.get('location', '')),
+                'linkedin': parsed_data.get('linkedin', ''),
+                'github': parsed_data.get('github', ''),
+                'portfolio_url': parsed_data.get('portfolio_url', ''),
+                
+                # Professional Summary
                 'summary': self._clean_text(parsed_data.get('summary', '')),
+                
+                # Skills
                 'skills': self._process_skills(parsed_data.get('skills', [])),
+                
+                # Work Experience
                 'experience': self._process_experience(parsed_data.get('experience', [])),
+                
+                # Projects
+                'projects': self._process_projects(parsed_data.get('projects', [])),
+                
+                # Education
                 'education': self._process_education(parsed_data.get('education', [])),
+                
+                # Certifications
+                'certifications': self._process_certifications(parsed_data.get('certifications', [])),
+                
+                # Achievements
+                'achievements': parsed_data.get('achievements', []),
+                
+                # Languages
+                'languages': parsed_data.get('languages', []),
+                
+                # Interests
+                'interests': parsed_data.get('interests', []),
+                
                 'color_scheme': 'professional'  # Default color scheme
             }
             
@@ -97,6 +126,37 @@ class PortfolioGenerator:
             }]
         
         return processed_education
+    
+    def _process_projects(self, projects: list) -> list:
+        """Process project entries"""
+        processed_projects = []
+        
+        for project in projects:
+            if isinstance(project, dict):
+                processed_project = {
+                    'title': self._clean_text(project.get('title', 'Project')),
+                    'description': self._clean_text(project.get('description', '')),
+                    'technologies': project.get('technologies', []),
+                    'url': project.get('url', '')
+                }
+                processed_projects.append(processed_project)
+        
+        return processed_projects
+    
+    def _process_certifications(self, certifications: list) -> list:
+        """Process certification entries"""
+        processed_certifications = []
+        
+        for cert in certifications:
+            if isinstance(cert, dict):
+                processed_cert = {
+                    'name': self._clean_text(cert.get('name', 'Certification')),
+                    'issuer': self._clean_text(cert.get('issuer', '')),
+                    'year': cert.get('year', '')
+                }
+                processed_certifications.append(processed_cert)
+        
+        return processed_certifications
     
     def _generate_default_summary(self, portfolio_data: Dict) -> str:
         """Generate a default professional summary"""
