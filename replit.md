@@ -8,6 +8,18 @@ This is a Flask-based web application that automatically converts uploaded resum
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+**July 26, 2025**: Major portfolio template enhancement
+- Completely redesigned portfolio template with modern dark theme
+- Added animated background with floating gradients
+- Implemented fixed navigation with smooth scrolling
+- Created responsive timeline layout for experience and education
+- Enhanced skill cards with gradient backgrounds and hover effects
+- Added scroll-triggered animations and intersection observers
+- Improved mobile responsiveness and print styles
+- Updated downloadable CSS to match new design
+
 ## System Architecture
 
 The application follows a traditional Flask MVC architecture with clear separation of concerns:
