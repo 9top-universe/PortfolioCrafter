@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume to Portfolio Generator</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container py-5">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <i class="fas fa-file-user fa-4x text-info mb-3"></i>
+            <h1 class="display-4 fw-bold">Resume to Portfolio Generator</h1>
+            <p class="lead text-muted">Transform your resume into a professional portfolio website in seconds</p>
+        </div>
+
+        <!-- Features -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-upload fa-2x text-success mb-3"></i>
+                        <h5 class="card-title">Easy Upload</h5>
+                        <p class="card-text">Simply upload your resume in PDF or DOCX format</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-magic fa-2x text-warning mb-3"></i>
+                        <h5 class="card-title">Auto Generation</h5>
+                        <p class="card-text">AI-powered parsing extracts your information automatically</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-download fa-2x text-primary mb-3"></i>
+                        <h5 class="card-title">Instant Download</h5>
+                        <p class="card-text">Get your complete portfolio website as a ZIP file</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="text-center">
+            <a href="{{ url_for('upload_page') }}" class="btn btn-info btn-lg px-5 py-3">
+                <i class="fas fa-rocket me-2"></i>
+                Get Started
+            </a>
+        </div>
+
+        <!-- How it Works -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h2 class="text-center mb-4">How It Works</h2>
+                <div class="row g-4">
+                    <div class="col-md-3 text-center">
+                        <div class="rounded-circle bg-info d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <span class="fw-bold fs-4">1</span>
+                        </div>
+                        <h6>Upload Resume</h6>
+                        <p class="small text-muted">Upload your resume in PDF or DOCX format</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="rounded-circle bg-success d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <span class="fw-bold fs-4">2</span>
+                        </div>
+                        <h6>AI Processing</h6>
+                        <p class="small text-muted">Our system extracts and organizes your information</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="rounded-circle bg-warning d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <span class="fw-bold fs-4">3</span>
+                        </div>
+                        <h6>Preview</h6>
+                        <p class="small text-muted">Review your generated portfolio website</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <span class="fw-bold fs-4">4</span>
+                        </div>
+                        <h6>Download</h6>
+                        <p class="small text-muted">Get your complete portfolio as a ZIP file</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

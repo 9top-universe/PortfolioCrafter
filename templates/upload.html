@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Resume - Portfolio Generator</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container py-5">
+        <!-- Navigation -->
+        <nav class="mb-4">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Home
+            </a>
+        </nav>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Upload Form -->
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card border-0 shadow">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-info mb-3"></i>
+                            <h2 class="card-title">Upload Your Resume</h2>
+                            <p class="text-muted">Upload your resume and we'll create a beautiful portfolio website for you</p>
+                        </div>
+
+                        <form id="uploadForm" method="POST" enctype="multipart/form-data" class="text-center">
+                            <div class="upload-area mb-4" id="uploadArea">
+                                <div class="upload-content">
+                                    <i class="fas fa-file-upload fa-3x mb-3 text-muted"></i>
+                                    <h5>Drag & Drop your resume here</h5>
+                                    <p class="text-muted">or click to browse</p>
+                                    <p class="small text-muted">Supported formats: PDF, DOCX (Max 16MB)</p>
+                                </div>
+                                <input type="file" id="resumeFile" name="resume" accept=".pdf,.docx,.doc" required style="display: none;">
+                            </div>
+
+                            <div id="fileInfo" class="file-info mb-4" style="display: none;">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-file-alt me-2 text-success"></i>
+                                    <span id="fileName"></span>
+                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" id="removeFile">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-info btn-lg px-5" id="submitBtn" disabled>
+                                <span id="btnText">
+                                    <i class="fas fa-magic me-2"></i>
+                                    Generate Portfolio
+                                </span>
+                                <span id="btnLoading" style="display: none;">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    Processing...
+                                </span>
+                            </button>
+                        </form>
+
+                        <!-- Progress Bar -->
+                        <div id="progressContainer" class="mt-4" style="display: none;">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <div class="text-center mt-2">
+                                <small class="text-muted">Processing your resume...</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips -->
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-lightbulb text-warning me-2"></i>
+                            Tips for Best Results
+                        </h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Use a well-formatted resume with clear sections
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Include your contact information at the top
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                List your skills and experience clearly
+                            </li>
+                            <li>
+                                <i class="fas fa-check text-success me-2"></i>
+                                Ensure text is selectable (not scanned images)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+</body>
+</html>
