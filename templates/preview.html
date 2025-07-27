@@ -14,14 +14,14 @@
         <div class="row mb-4">
             <div class="col-md-6">
                 <nav>
-                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ url_for('routes.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i>
                         Back to Home
                     </a>
                 </nav>
             </div>
             <div class="col-md-6 text-end">
-                <a href="{{ url_for('download_portfolio', portfolio_id=portfolio.id) }}" class="btn btn-success">
+                <a href="{{ url_for('routes.download_portfolio', portfolio_id=portfolio.id) }}" class="btn btn-success">
                     <i class="fas fa-download me-2"></i>
                     Download Portfolio
                 </a>

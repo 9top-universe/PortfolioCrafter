@@ -1,49 +1,33 @@
 import os
-import logging
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
+from extensions import db
+from routes import routes
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
+def create_app():
+    app = Flask(__name__)
+    app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-class Base(DeclarativeBase):
-    pass
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+    app.config['UPLOAD_FOLDER'] = 'uploads'
+    app.config['GENERATED_FOLDER'] = 'generated'
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config['GENERATED_FOLDER'], exist_ok=True)
 
-db = SQLAlchemy(model_class=Base)
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///portfolio_generator.db")
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_recycle": 300, "pool_pre_ping": True}
 
-# Create the app
-app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+    db.init_app(app)
 
-# Configure upload settings
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['GENERATED_FOLDER'] = 'generated'
+    with app.app_context():
+        from models import Portfolio
+        db.create_all()
 
-# Create upload directories
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['GENERATED_FOLDER'], exist_ok=True)
+    app.register_blueprint(routes)
 
-# Configure database (using SQLite for simplicity)
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///portfolio_generator.db")
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-}
-
-# Initialize the app with the extension
-db.init_app(app)
-
-with app.app_context():
-    # Import models and routes
-    import models
-    import routes
-    
-    # Create all database tables
-    db.create_all()
+    return app
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app = create_app()
+    app.run(debug=True)

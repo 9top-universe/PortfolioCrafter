@@ -1,4 +1,4 @@
-from app import db
+from extensions import db
 from datetime import datetime
 
 class Portfolio(db.Model):
@@ -9,6 +9,6 @@ class Portfolio(db.Model):
     email = db.Column(db.String(255))
     phone = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     def __repr__(self):
         return f'<Portfolio {self.name}>'
